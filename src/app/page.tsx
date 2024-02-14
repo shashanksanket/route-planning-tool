@@ -327,7 +327,7 @@ export default function Home() {
     <>
       <main className="flex flex-col gap-y-10 m-4">
         <div id="map" style={{ width: '100%', height: '400px' }}></div>
-        <div className='flex py-3 px-2 justify-around gap-x-10'>
+        <div className='flex py-3 px-2 flex-col md:flex-row justify-around gap-x-10'>
           <div className='flex gap-x-5'>
             <input className='border rounded py-2 px-4' ref={inputRef} onFocus={handleInputFocus} placeholder="Enter a location" />
             <button className='rounded-full bg-blue-900 text-white hover:text-black hover:bg-white hover:border-blue-900 border py-2 px-4' onClick={handleMarkLocation}>Mark Location</button>
@@ -352,7 +352,7 @@ export default function Home() {
           <button className='rounded-full bg-blue-900 text-white hover:text-black hover:bg-white hover:border-blue-900 border py-2 px-4' onClick={handleCalculateRoute}>Calculate Route</button>
         </div>
         {markersList.length > 2 && (
-          <p>Technitian Location: {markersList[markersList.length - 1].location}</p>
+          <p className='ml-10'>Technician Location: {markersList[markersList.length - 1].location}</p>
         )}
       </main>
     </>
