@@ -6,6 +6,7 @@ let db: {
   exec(arg0: string): unknown;
   run(arg0: string, arg1: any[]): unknown; all: (arg0: string) => any; 
 } | null = null;
+
 async function createTable() {
   if (!db) {
     db = await open({
@@ -30,10 +31,11 @@ async function createTable() {
         isCurrentLocation BOOLEAN NOT NULL
       )
     `);
-}
+  }
 }
 
 createTable();
+
 export async function GET(req: any, res: any) {
   if (!db) {
     db = await open({
@@ -44,10 +46,13 @@ export async function GET(req: any, res: any) {
 
   const addressList = await db.all("SELECT * FROM addresses");
 
-  return new Response(JSON.stringify(addressList), {
-    headers: { "content-type": "application/json" },
-    status: 200,
-  });
+  // Add CORS headers to the response
+  res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Requested-With");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+
+  return res.status(200).json(addressList);
 }
 
 export async function POST(req: any, res: any) {
@@ -63,13 +68,13 @@ export async function POST(req: any, res: any) {
   try {
     const existingEntry = await db.get("SELECT * FROM addresses WHERE location = ?", [location]);
     if (existingEntry) {
-      return new Response(
-        JSON.stringify({ message: "Location already exists in the database" }),
-        {
-          headers: { "content-type": "application/json" },
-          status: 400,
-        }
-      );
+      // Add CORS headers to the response
+      res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+      res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+      res.setHeader("Access-Control-Allow-Headers", "Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Requested-With");
+      res.setHeader("Access-Control-Allow-Credentials", "true");
+
+      return res.status(400).json({ message: "Location already exists in the database" });
     }
 
     await db.run(
@@ -77,21 +82,22 @@ export async function POST(req: any, res: any) {
       [location, latitude, longitude, isCurrentLocation]
     );
 
-    return new Response(
-      JSON.stringify({ message: "success" }),
-      {
-        headers: { "content-type": "application/json" },
-        status: 200,
-      }
-    );
+    // Add CORS headers to the response
+    res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Requested-With");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+
+    return res.status(200).json({ message: "success" });
   } catch (error) {
     console.error("Error while processing POST request:", error);
-    return new Response(
-      JSON.stringify({ message: "Internal Server Error" }),
-      {
-        headers: { "content-type": "application/json" },
-        status: 500,
-      }
-    );
+    
+    // Add CORS headers to the response
+    res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Requested-With");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 }
