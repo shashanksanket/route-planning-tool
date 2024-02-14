@@ -3,6 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Client } from '@/lib/client';
 import Head from 'next/head';
 import { IAddress } from '@/lib/common/interfaces/address';
+import MapComponent from '@/components/Map/map';
+import ControlsComponent from '@/components/Control/controls';
 
 const client = new Client();
 
@@ -325,32 +327,18 @@ export default function Home() {
 
   return (
     <>
-      <main className="flex flex-col gap-y-10 m-4">
-        <div id="map" style={{ width: '100%', height: '400px' }}></div>
-        <div className='flex py-3 px-2 flex-col md:flex-row justify-around gap-x-10'>
-          <div className='flex gap-x-5'>
-            <input className='border rounded py-2 px-4' ref={inputRef} onFocus={handleInputFocus} placeholder="Enter a location" />
-            <button className='rounded-full bg-blue-900 text-white hover:text-black hover:bg-white hover:border-blue-900 border py-2 px-4' onClick={handleMarkLocation}>Mark Location</button>
-          </div>
-
-          <div className='flex gap-x-5'>
-            <select
-              className='border rounded py-2 px-4'
-              value={selectedMarkerId || ""}
-              onChange={(e) => {
-                const selectedMarkerId = parseInt(e.target.value, 10);
-                handleMarkerSelect(selectedMarkerId);
-              }}
-            >
-              <option key="default" value="">Select a marker to delete</option>
-              {markersList.map(marker => (
-                <option key={marker.id} value={marker.id}>{marker.location}</option>
-              ))}
-            </select>
-            <button className='rounded-full bg-blue-900 text-white hover:text-black hover:bg-white hover:border-blue-900 border py-2 px-4' onClick={handleDeleteMarker}>Delete Marker</button>
-          </div>
-          <button className='rounded-full bg-blue-900 text-white hover:text-black hover:bg-white hover:border-blue-900 border py-2 px-4' onClick={handleCalculateRoute}>Calculate Route</button>
-        </div>
+       <main className="flex flex-col gap-y-10 m-4">
+        <MapComponent markers={markers} />
+        <ControlsComponent
+          inputRef={inputRef}
+          handleInputFocus={handleInputFocus}
+          handleMarkLocation={handleMarkLocation}
+          selectedMarkerId={selectedMarkerId}
+          markersList={markersList}
+          handleMarkerSelect={handleMarkerSelect}
+          handleDeleteMarker={handleDeleteMarker}
+          handleCalculateRoute={handleCalculateRoute}
+        />
         {markersList.length > 2 && (
           <p className='ml-10'>Technician Location: {markersList[markersList.length - 1].location}</p>
         )}
