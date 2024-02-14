@@ -18,7 +18,7 @@ export default function Home() {
   const [flag, setFlag] = useState<boolean>(false);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [googleMap, setGoogleMap] = useState<google.maps.Map | null>(null);
-  const [selectedMarkTitle,setSelectedMarkerTitle] = useState<string>("")
+  const [selectedMarkTitle, setSelectedMarkerTitle] = useState<string>("")
 
   useEffect(() => {
     const loadMapScript = () => {
@@ -35,7 +35,7 @@ export default function Home() {
     if (!mapLoaded) {
       loadMapScript();
     }
-  }, [mapLoaded,markersList]);
+  }, [mapLoaded, markersList]);
 
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const addresses:any = await client.addressGetList();
+        const addresses: any = await client.addressGetList();
         const newMarkers: google.maps.Marker[] = addresses.map((address: IAddress) => {
           const marker = new google.maps.Marker({
             position: { lat: address.latitude, lng: address.longitude },
@@ -75,7 +75,7 @@ export default function Home() {
       }
     };
     fetchData();
-    
+
   }, []);
 
 
@@ -96,14 +96,14 @@ export default function Home() {
         return marker;
       });
       if (addresses.length > 0 && map) {
-        if(selectedMarkTitle == ""){
+        if (selectedMarkTitle == "") {
           const lastAddress = addresses[addresses.length - 1];
           map.setCenter({ lat: lastAddress.latitude, lng: lastAddress.longitude });
         }
       }
-    markers.forEach(marker => marker.setMap(null));
-    
-    setMarkers(newMarkers);
+      markers.forEach(marker => marker.setMap(null));
+
+      setMarkers(newMarkers);
     }
   }
 
@@ -241,7 +241,7 @@ export default function Home() {
   const handleCalculateRoute = async () => {
     let technitianMarker: google.maps.Marker | undefined;
     const destinations: google.maps.Marker[] = [];
-    
+
     for (let i = 0; i < markers.length; i++) {
       if (i === markers.length - 1) {
         technitianMarker = markers[i];
@@ -269,7 +269,7 @@ export default function Home() {
   const handleMarkerSelect = (id: number) => {
     setSelectedMarkerId(id);
     const selectedMarker = markersList.find(marker => marker.id === id);
-    setSelectedMarkerTitle(selectedMarker?.location||"")
+    setSelectedMarkerTitle(selectedMarker?.location || "")
     if (selectedMarker && map) {
       map.setCenter({ lat: selectedMarker.latitude, lng: selectedMarker.longitude });
     }
@@ -277,7 +277,7 @@ export default function Home() {
   useEffect(() => {
     // Remove all markers from the map when the markers state changes
     markers.forEach(marker => marker.setMap(null));
-    
+
     // Set the map again with the updated markers
     if (googleMap && markers.length > 0) {
       markers.forEach(marker => marker.setMap(googleMap));
@@ -291,26 +291,25 @@ export default function Home() {
       setSelectedMarkerId(null);
       const updatedMarkers = markers.filter(marker => marker.getTitle() !== selectedMarkTitle);
       markers.forEach(marker => marker.setMap(null));
-  
-      // Reinitialize the map after marker deletion
-        setMap(null); // Remove the existing map instance
-        const newMapInstance = new google.maps.Map(document.getElementById('map')!, {
-          center: { lat: 0, lng: 0 },
-          zoom: 8,
-        });
-        setGoogleMap(newMapInstance);
-        setMap(newMapInstance);
-  
-        // Fetch markers again after deletion
-        await fetchMarkers();
+
+      setMap(null);
+      const newMapInstance = new google.maps.Map(document.getElementById('map')!, {
+        center: { lat: 0, lng: 0 },
+        zoom: 8,
+      });
+      setGoogleMap(newMapInstance);
+      setMap(newMapInstance);
+
+      // Fetch markers again after deletion
+      await fetchMarkers();
     }
   };
-  
+
 
   useEffect(() => {
     // Remove all markers from the map when the markers state changes
     markers.forEach(marker => marker.setMap(null));
-  
+
     // Set the map again with the updated markers
     if (googleMap && markers.length > 0) {
       markers.forEach(marker => marker.setMap(googleMap));
@@ -333,7 +332,7 @@ export default function Home() {
             <input className='border rounded py-2 px-4' ref={inputRef} onFocus={handleInputFocus} placeholder="Enter a location" />
             <button className='rounded-full bg-blue-900 text-white hover:text-black hover:bg-white hover:border-blue-900 border py-2 px-4' onClick={handleMarkLocation}>Mark Location</button>
           </div>
-         
+
           <div className='flex gap-x-5'>
             <select
               className='border rounded py-2 px-4'
@@ -352,8 +351,8 @@ export default function Home() {
           </div>
           <button className='rounded-full bg-blue-900 text-white hover:text-black hover:bg-white hover:border-blue-900 border py-2 px-4' onClick={handleCalculateRoute}>Calculate Route</button>
         </div>
-        {markersList.length>2 && (
-          <p>Technitian Location: {markersList[markersList.length-1].location}</p>
+        {markersList.length > 2 && (
+          <p>Technitian Location: {markersList[markersList.length - 1].location}</p>
         )}
       </main>
     </>
