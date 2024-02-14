@@ -45,7 +45,6 @@ export async function GET(req: any, res: any) {
   const addressList = await db.all("SELECT * FROM addresses");
 
   return new Response(JSON.stringify(addressList), {
-    headers: { "content-type": "application/json" },
     status: 200,
   });
 }
@@ -79,7 +78,6 @@ export async function POST(req: any, res: any) {
     return new Response(
       JSON.stringify({ message: "success" }),
       {
-        headers: { "content-type": "application/json" },
         status: 200,
       }
     );

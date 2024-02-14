@@ -22,7 +22,6 @@ export async function DELETE(req: any, res: any) {
   return new Response(
     JSON.stringify({ message: "success" }),
     {
-      headers: { "content-type": "application/json" },
       status: 200,
     }
   );
@@ -43,7 +42,6 @@ export async function PATCH(req:any, res:any) {
   return new Response(
     JSON.stringify({ message: "success" }),
     {
-      headers: { "content-type": "application/json" },
       status: 200,
     }
   );
