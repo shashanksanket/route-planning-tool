@@ -1,6 +1,6 @@
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
-
+export const dynamic = "force-dynamic"
 let db: {
   run(arg0: string, id: any): unknown; 
   all: (arg0: string) => any; 
