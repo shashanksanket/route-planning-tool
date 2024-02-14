@@ -1,5 +1,6 @@
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
+import path from "path";
 export const dynamic = "force-dynamic"
 let db: {
   run(arg0: string, id: any): unknown; 
@@ -8,8 +9,9 @@ let db: {
 
 export async function DELETE(req: any, res: any) {
   if (!db) {
+    const databasePath = path.join(process.cwd(), 'database.db')
     db = await open({
-      filename: "database.db",
+      filename: databasePath,
       driver: sqlite3.Database,
     });
   }
@@ -29,8 +31,9 @@ export async function DELETE(req: any, res: any) {
 
 export async function PATCH(req:any, res:any) {
   if (!db) {
+    const databasePath = path.join(process.cwd(), 'database.db')
     db = await open({
-      filename: "database.db",
+      filename: databasePath,
       driver: sqlite3.Database,
     });
   }
