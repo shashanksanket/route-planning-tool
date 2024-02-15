@@ -1,7 +1,10 @@
+import path from "path";
 import sqlite3 from "sqlite3";
 
+const databasePath = path.join(process.cwd(), 'database.db')
+
 const db = new sqlite3.Database(
-  "database.db",
+  databasePath,
   sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
   (err) => {
     if (err) {
