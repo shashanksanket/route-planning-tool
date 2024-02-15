@@ -4,9 +4,9 @@ interface ControlsComponentProps {
   inputRef: RefObject<HTMLInputElement>;
   handleInputFocus: () => void;
   handleMarkLocation: () => void;
-  selectedMarkerId: number | null;
+  selectedMarkerId: string | null;
   markersList: IAddress[];
-  handleMarkerSelect: (selectedMarkerId: number) => void;
+  handleMarkerSelect: (selectedMarkerId: string) => void;
   handleDeleteMarker: () => void;
   handleCalculateRoute: () => void;
 }
@@ -33,13 +33,13 @@ const ControlsComponent: React.FC<ControlsComponentProps> = ({
           className='border rounded py-2 px-4'
           value={selectedMarkerId || ""}
           onChange={(e) => {
-            const selectedMarkerId = parseInt(e.target.value, 10);
+            const selectedMarkerId = e.target.value;
             handleMarkerSelect(selectedMarkerId);
           }}
         >
           <option key="default" value="">Select location that you visited</option>
           {markersList.map(marker => (
-            <option key={marker.id} value={marker.id}>{marker.location}</option>
+            <option key={marker._id} value={marker._id}>{marker.location}</option>
           ))}
         </select>
         <button className='rounded-full bg-blue-900 text-white hover:text-black hover:bg-white hover:border-blue-900 border py-2 px-4' onClick={handleDeleteMarker}>Mark Visited</button>

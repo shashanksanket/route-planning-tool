@@ -1,51 +1,76 @@
-import sqlite3 from "sqlite3";
-import { open } from "sqlite";
-import path from "path";
-export const dynamic = "force-dynamic"
-let db: {
-  run(arg0: string, id: any): unknown; 
-  all: (arg0: string) => any; 
-} | null = null;
+import { MongoClient, Db, ObjectId } from 'mongodb';
 
-export async function DELETE(req: any, res: any) {
-  if (!db) {
-    const databasePath = path.join(process.cwd(), 'database.db')
-    db = await open({
-      filename: databasePath,
-      driver: sqlite3.Database,
-    });
-  }
+let db: Db | null = null;
+const options: any = {
+  retryWrites: true,
+  w: "majority",
+};
 
-  const { id } = await req.json();
-
-  await db.run("DELETE FROM addresses WHERE id = ?", id);
-
-  // Set the status and headers using the Response constructor
-  return new Response(
-    JSON.stringify({ message: "success" }),
-    {
-      status: 200,
+async function connectToDataBase() {
+  try {
+    if (!db) {
+      const uri = process.env.MONGODB_URI;
+      const client = new MongoClient(uri!, options);
+      await client.connect();
+      db = client.db(); 
+      console.log("Connected to MongoDB");
     }
-  );
+  } catch (error) {
+    console.error("Error connecting to MongoDB:", error);
+    throw error; 
+  }
 }
 
-export async function PATCH(req:any, res:any) {
-  if (!db) {
-    const databasePath = path.join(process.cwd(), 'database.db')
-    db = await open({
-      filename: databasePath,
-      driver: sqlite3.Database,
-    });
+export async function DELETE(req: any, res: any) {
+  try {
+    await connectToDataBase();
+
+    const { _id } = await req.json();
+    console.log("here inside abckend",_id)
+    const deletedEntry = await db!.collection("addresses").findOneAndDelete({ _id: new ObjectId(_id) });
+
+    console.log(deletedEntry)
+    return new Response(
+      JSON.stringify({ message: "success" }),
+      {
+        status: 200,
+      }
+    );
+  } catch (error) {
+    console.error("Error deleting document from MongoDB:", error);
+    return new Response(
+      JSON.stringify({ message: "Internal Server Error" }),
+      {
+        status: 500,
+      }
+    );
   }
+}
 
-  const { id, isCurrentLocation } = await req.json();
+export async function PATCH(req: any, res: any) {
+  try {
+    await connectToDataBase();
 
-  await db.run("UPDATE addresses SET isCurrentLocation = ? WHERE id = ?", [isCurrentLocation,id]);
-  
-  return new Response(
-    JSON.stringify({ message: "success" }),
-    {
-      status: 200,
-    }
-  );
+    const { id, isCurrentLocation } = await req.json();
+
+    await db!.collection("addresses").updateOne(
+      { _id: id as ObjectId },
+      { $set: { isCurrentLocation } }
+    );
+
+    return new Response(
+      JSON.stringify({ message: "success" }),
+      {
+        status: 200,
+      }
+    );
+  } catch (error) {
+    console.error("Error updating document in MongoDB:", error);
+    return new Response(
+      JSON.stringify({ message: "Internal Server Error" }),
+      {
+        status: 500,
+      }
+    );
+  }
 }

@@ -43,7 +43,7 @@ export class Client {
     );
   }
   addressUpdate(
-    id:number,
+    id:string,
     isCurrentLocation:boolean
   ): Promise<Response> {
     return this.handleResponse(
@@ -51,10 +51,10 @@ export class Client {
     );
   }
 
-  addressDelete(id: number): Promise<Response> {
-    const body = { id }
+  addressDelete(_id: string): Promise<Response> {
+    const body = { _id }
     return this.handleResponse(
-      sendDeleteRequest(DELETE_ADDRESS(id),this.getDefaultHeaders(), {}, body)
+      sendDeleteRequest(DELETE_ADDRESS(_id),this.getDefaultHeaders(),body,{})
     )
   }
 
@@ -67,6 +67,7 @@ export class Client {
       const response = await request;
       return response;
     } catch (error) {
+      console.log(error)
       return getResponse(null, "GEN1");
     }
   }

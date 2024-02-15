@@ -14,7 +14,7 @@ export default function Home() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
   const [markersList, setMarkerList] = useState<IAddress[]>([]);
-  const [selectedMarkerId, setSelectedMarkerId] = useState<number | null>(null);
+  const [selectedMarkerId, setSelectedMarkerId] = useState<string | null>(null);
   const [currentLocation, setCurrentLocation] = useState<string>("");
   const [currentLocationId, setCurrentLocationId] = useState<number>(0);
   const [flag, setFlag] = useState<boolean>(false);
@@ -265,9 +265,9 @@ export default function Home() {
     }
   };
 
-  const handleMarkerSelect = (id: number) => {
+  const handleMarkerSelect = (id: string) => {
     setSelectedMarkerId(id);
-    const selectedMarker = markersList.find(marker => marker.id === id);
+    const selectedMarker = markersList.find(marker => marker._id === id);
     setSelectedMarkerTitle(selectedMarker?.location || "")
     if (selectedMarker && map) {
       map.setCenter({ lat: selectedMarker.latitude, lng: selectedMarker.longitude });
@@ -282,9 +282,11 @@ export default function Home() {
   }, [markers, googleMap]);
 
   const handleDeleteMarker = async () => {
+    console.log(selectedMarkerId)
     if (selectedMarkerId) {
       const markerId = selectedMarkerId;
-      await client.addressDelete(markerId);
+      const res = await client.addressDelete(markerId);
+      console.log(res)
       setSelectedMarkerId(null);
       const updatedMarkers = markers.filter(marker => marker.getTitle() !== selectedMarkTitle);
       markers.forEach(marker => marker.setMap(null));

@@ -59,23 +59,24 @@ export const sendPutRequest = async (
 export const sendDeleteRequest = async (
   url: string,
   headers: any,
+  body: any,
   query: any,
-  body: any
 ) => {
   const formattedUrl = addQueryToUrl(url, query);
   const response = await fetch(formattedUrl, {
     method: "DELETE",
     headers,
+    body: JSON.stringify(body),
     cache: "no-store",
     signal,
-    body: JSON.stringify(body),
-    mode: "no-cors",
+    mode: "cors",
     credentials: "include",
   });
   return await response.json();
 };
 
 const addQueryToUrl = (url: string, query: any) => {
+  console.log(url)
   const queryKeys = Object.keys(query);
   if (queryKeys.length === 0) {
     return url;

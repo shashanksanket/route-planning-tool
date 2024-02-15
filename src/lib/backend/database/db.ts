@@ -1,37 +1,26 @@
-import path from "path";
-import sqlite3 from "sqlite3";
+import mongoose, { ConnectOptions } from "mongoose";
 
-const databasePath = path.join(process.cwd(), 'database.db')
+let uri = process.env.MONGODB_URI;
+let isConnected = false;
 
-const db = new sqlite3.Database(
-  databasePath,
-  sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
-  (err) => {
-    if (err) {
-      console.error(err.message);
-    } else {
-      console.log("Connected to the SQLite database.");
-    }
+export const connectToDataBase = async () => {
+  mongoose.set("strictQuery", true);
+
+  if (isConnected) {
+    console.log("DB connected already");
+    return;
   }
-);
-
-db.serialize(() => {
-  db.run(
-    `CREATE TABLE IF NOT EXISTS address(
-        id INTEGER PRIMARY KEY,
-        location TEXT,
-        longitude NUMBER,
-        latitude NUMBER
-        isCurrentLocation BOOLEAN
-        )`,
-    (err) => {
-      if (err) {
-        console.error(err.message);
-      } else {
-        console.log("Created addresses table");
-      }
+  const options: any = {
+    retryWrites: true,
+    w: "majority",
+  };
+  try {
+    if (uri) {
+      await mongoose.connect(uri, options)
     }
-  );
-});
-
-export default db;
+    isConnected = true;
+    console.log("database connected successfully")
+  } catch (error) {
+    console.log(error);
+  }
+};

@@ -1,68 +1,54 @@
-import sqlite3 from "sqlite3";
-import { open } from "sqlite";
-import path from "path";
-export const dynamic = "force-dynamic"
+import { MongoClient, Db } from 'mongodb';
+import { ObjectId } from 'mongoose';
 
-let db: {
-  get(arg0: string, arg1?:string[]): unknown;
-  exec(arg0: string): unknown;
-  run(arg0: string, arg1: any[]): unknown; all: (arg0: string) => any; 
-} | null = null;
-async function createTable() {
-  if (!db) {
-    const databasePath = path.join(process.cwd(), 'database.db')
-    db = await open({
-      filename: databasePath,
-      driver: sqlite3.Database,
-    });
+let db: Db | null = null;
+const options: any = {
+  retryWrites: true,
+  w: "majority",
+};
+async function connectToDataBase() {
+  try {
+    if (!db) {
+      const uri = process.env.MONGODB_URI;
+      const client = new MongoClient(uri!, options);
+      await client.connect();
+      db = client.db(); // Use your database name if it's not the default one
+      console.log("Connected to MongoDB");
+    }
+  } catch (error) {
+    console.error("Error connecting to MongoDB:", error);
+    throw error; // Rethrow error for the caller to handle
   }
-
-  const tableExists = await db.get(
-    "SELECT name FROM sqlite_master WHERE type='table' AND name='addresses'"
-  );
-  if (!tableExists) {
-    await db.exec(`
-      CREATE TABLE addresses (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        location TEXT NOT NULL,
-        latitude REAL NOT NULL,
-        longitude REAL NOT NULL,
-        isCurrentLocation BOOLEAN NOT NULL
-      )
-    `);
-}
 }
 
-createTable();
 export async function GET(req: any, res: any) {
-  if (!db) {
-    const databasePath = path.join(process.cwd(), 'database.db')
-    db = await open({
-      filename: databasePath,
-      driver: sqlite3.Database,
+  try {
+    await connectToDataBase();
+
+    const addressList = await db!.collection("addresses").find().toArray();
+
+    return new Response(JSON.stringify(addressList), {
+      status: 200,
     });
+  } catch (error) {
+    console.error("Error while retrieving data from MongoDB:", error);
+    return new Response(
+      JSON.stringify({ message: "Internal Server Error" }),
+      {
+        status: 500,
+      }
+    );
   }
-
-  const addressList = await db.all("SELECT * FROM addresses");
-
-  return new Response(JSON.stringify(addressList), {
-    status: 200,
-  });
 }
 
 export async function POST(req: any, res: any) {
-  if (!db) {
-    const databasePath = path.join(process.cwd(), 'database.db')
-    db = await open({
-      filename: databasePath,
-      driver: sqlite3.Database,
-    });
-  }
-
-  const { location, latitude, longitude, isCurrentLocation } = await req.json();
-
   try {
-    const existingEntry = await db.get("SELECT * FROM addresses WHERE location = ?", [location]);
+    await connectToDataBase();
+
+    const { location, latitude, longitude, isCurrentLocation } = await req.json();
+
+    const existingEntry = await db!.collection("addresses").findOne({ location });
+
     if (existingEntry) {
       return new Response(
         JSON.stringify({ message: "Location already exists in the database" }),
@@ -72,10 +58,12 @@ export async function POST(req: any, res: any) {
       );
     }
 
-    await db.run(
-      "INSERT INTO addresses (location, latitude, longitude, isCurrentLocation) VALUES (?,?,?,?)",
-      [location, latitude, longitude, isCurrentLocation]
-    );
+    await db!.collection("addresses").insertOne({
+      location,
+      latitude,
+      longitude,
+      isCurrentLocation
+    });
 
     return new Response(
       JSON.stringify({ message: "success" }),
@@ -85,6 +73,41 @@ export async function POST(req: any, res: any) {
     );
   } catch (error) {
     console.error("Error while processing POST request:", error);
+    return new Response(
+      JSON.stringify({ message: "Internal Server Error" }),
+      {
+        status: 500,
+      }
+    );
+  }
+}
+
+export async function DELETE(req: any, res: any) {
+  try {
+    console.log("here")
+    await connectToDataBase();
+
+    const { id } = await req.json();
+
+    const deletedEntry:any = await db!.collection("addresses").findOneAndDelete({ _id: id as ObjectId });
+
+    if (!deletedEntry.value) {
+      return new Response(
+        JSON.stringify({ message: "Address not found" }),
+        {
+          status: 404,
+        }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({ message: "Address deleted successfully" }),
+      {
+        status: 200,
+      }
+    );
+  } catch (error) {
+    console.error("Error while processing DELETE request:", error);
     return new Response(
       JSON.stringify({ message: "Internal Server Error" }),
       {
