@@ -5,7 +5,7 @@ interface MapComponentProps {
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ markers }) => {
-  const [googleMap, setGoogleMap] = useState<google.maps.Map | null>(null);
+  const [googleMap, setGoogleMap] = useState<google.maps.Map>();
 
 
   useEffect(() => {
@@ -15,7 +15,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ markers }) => {
       script.async = true;
       script.defer = true;
       script.onload = () => {
-        const mapInstance = new google.maps.Map(document.getElementById('map')!, {
+        const mapInstance = new google.maps.Map(document.getElementById('map'), {
           center: { lat: 0, lng: 0 },
           zoom: 8,
         });
