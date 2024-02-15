@@ -324,7 +324,7 @@ export default function Home() {
 
   return (
     <>
-      <main className="flex flex-col gap-y-10 m-4">
+      <main className="flex flex-wrap flex-col gap-y-10 m-4">
         <MapComponent markers={markers} />
         <ControlsComponent
           inputRef={inputRef}

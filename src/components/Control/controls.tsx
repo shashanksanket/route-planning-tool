@@ -22,13 +22,13 @@ const ControlsComponent: React.FC<ControlsComponentProps> = ({
   handleCalculateRoute 
 }) => {
   return (
-    <div className='flex py-3 px-2 flex-col md:flex-row justify-around gap-x-10'>
-      <div className='flex gap-x-5'>
+    <div className='flex py-3 flex-wrap px-2 flex-col md:flex-row justify-around gap-10'>
+      <div className='flex flex-wrap flex-col md:flex-row gap-5'>
         <input className='border rounded py-2 px-4' ref={inputRef} onFocus={handleInputFocus} placeholder="Enter a location" />
         <button className='rounded-full bg-blue-900 text-white hover:text-black hover:bg-white hover:border-blue-900 border py-2 px-4' onClick={handleMarkLocation}>Mark Location</button>
       </div>
 
-      <div className='flex gap-x-5'>
+      <div className='flex flex-wrap flex-col md:flex-row gap-5'>
         <select
           className='border rounded py-2 px-4'
           value={selectedMarkerId || ""}
