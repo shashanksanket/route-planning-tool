@@ -14,7 +14,7 @@ export const sendPostRequest = async (
     body: JSON.stringify(body),
     cache: "no-store",
     signal,
-    mode: "cors",
+    mode: "no-cors",
     credentials: "include",
   });
   if (isJSONResponse) {
@@ -31,7 +31,7 @@ export const sendGetRequest = async (url: string, headers: any, query: any) => {
     headers,
     cache: "no-store",
     signal,
-    mode: "cors",
+    mode: "no-cors",
     credentials: "include",
   });
 
@@ -50,7 +50,7 @@ export const sendPutRequest = async (
     body: JSON.stringify(body),
     cache: "no-store",
     signal,
-    mode: "cors",
+    mode: "no-cors",
     credentials: "include",
   });
   return await response.json();
@@ -69,7 +69,7 @@ export const sendDeleteRequest = async (
     cache: "no-store",
     signal,
     body: JSON.stringify(body),
-    mode: "cors",
+    mode: "no-cors",
     credentials: "include",
   });
   return await response.json();
