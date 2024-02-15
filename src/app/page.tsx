@@ -5,6 +5,7 @@ import Head from 'next/head';
 import { IAddress } from '@/lib/common/interfaces/address';
 import MapComponent from '@/components/Map/map';
 import ControlsComponent from '@/components/Control/controls';
+import HowToUseComponent from '@/components/HowToUse/HowToUse';
 
 const client = new Client();
 
@@ -21,6 +22,7 @@ export default function Home() {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [googleMap, setGoogleMap] = useState<google.maps.Map | null>(null);
   const [selectedMarkTitle, setSelectedMarkerTitle] = useState<string>("")
+  const [showHowToUse, setShowHowToUse] = useState<boolean>(false);
 
   useEffect(() => {
     const loadMapScript = () => {
@@ -227,6 +229,7 @@ export default function Home() {
       optimizeWaypoints: true,
       travelMode: google.maps.TravelMode.DRIVING
     };
+
     const directionsService = new google.maps.DirectionsService();
     const directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
 
@@ -234,7 +237,7 @@ export default function Home() {
       if (status === "OK") {
         directionsRenderer.setDirections(response);
       } else {
-        alert("Directions request failed due to " + status);
+        alert("No roots can be found for a pair of locations");
       }
     });
   };
@@ -339,6 +342,10 @@ export default function Home() {
         {markersList.length > 1 && (
           <p className='ml-10'>Technician Location: {markersList[markersList.length - 1].location}</p>
         )}
+        <p className='ml-10 cursor-pointer text-blue-800 inline-block w-fit' onClick={() => setShowHowToUse(true)}>Need Help?</p>
+        <div className='absolute'>
+          <HowToUseComponent show={showHowToUse} onClose={() => setShowHowToUse(false)} />
+        </div>
       </main>
     </>
   );
