@@ -136,7 +136,7 @@ export default function Home() {
             }
             const res = await client.createAddress(location, longitude, latitude, isCurrentLocation);
             await fetchMarkers();
-            console.log("Saved marker in db:", res);
+            alert("Saved marker in db:");
 
             inputRef.current!.value = '';
 
@@ -227,8 +227,6 @@ export default function Home() {
       optimizeWaypoints: true,
       travelMode: google.maps.TravelMode.DRIVING
     };
-    console.log(request)
-
     const directionsService = new google.maps.DirectionsService();
     const directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
 
@@ -257,14 +255,13 @@ export default function Home() {
       addresses.push(technitianMarker);
       addresses.push(...destinations);
       const shortestPath = await findShortestRoute(addresses);
-      console.log(shortestPath);
       const addressString: string[] = []
       for (let i = 0; i < shortestPath.length; i++) {
         addressString.push(shortestPath[i].getTitle() || "")
       }
       drawPathRoute(addressString);
     } else {
-      console.error("Current location or destinations not found.");
+      alert("Location or destinations not found. Atleast give 2 location to generate route");
     }
   };
 
@@ -277,10 +274,8 @@ export default function Home() {
     }
   };
   useEffect(() => {
-    // Remove all markers from the map when the markers state changes
     markers.forEach(marker => marker.setMap(null));
 
-    // Set the map again with the updated markers
     if (googleMap && markers.length > 0) {
       markers.forEach(marker => marker.setMap(googleMap));
     }
@@ -302,17 +297,14 @@ export default function Home() {
       setGoogleMap(newMapInstance);
       setMap(newMapInstance);
 
-      // Fetch markers again after deletion
       await fetchMarkers();
     }
   };
 
 
   useEffect(() => {
-    // Remove all markers from the map when the markers state changes
     markers.forEach(marker => marker.setMap(null));
 
-    // Set the map again with the updated markers
     if (googleMap && markers.length > 0) {
       markers.forEach(marker => marker.setMap(googleMap));
     }
@@ -327,7 +319,7 @@ export default function Home() {
 
   return (
     <>
-       <main className="flex flex-col gap-y-10 m-4">
+      <main className="flex flex-col gap-y-10 m-4">
         <MapComponent markers={markers} />
         <ControlsComponent
           inputRef={inputRef}
@@ -339,7 +331,10 @@ export default function Home() {
           handleDeleteMarker={handleDeleteMarker}
           handleCalculateRoute={handleCalculateRoute}
         />
-        {markersList.length > 2 && (
+        {markersList.length > 0 && (
+          <p className='ml-10'>Total location Marked: {markersList.length}</p>
+        )}
+        {markersList.length > 1 && (
           <p className='ml-10'>Technician Location: {markersList[markersList.length - 1].location}</p>
         )}
       </main>

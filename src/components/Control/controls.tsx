@@ -37,12 +37,12 @@ const ControlsComponent: React.FC<ControlsComponentProps> = ({
             handleMarkerSelect(selectedMarkerId);
           }}
         >
-          <option key="default" value="">Select a marker to delete</option>
+          <option key="default" value="">Select location that you visited</option>
           {markersList.map(marker => (
             <option key={marker.id} value={marker.id}>{marker.location}</option>
           ))}
         </select>
-        <button className='rounded-full bg-blue-900 text-white hover:text-black hover:bg-white hover:border-blue-900 border py-2 px-4' onClick={handleDeleteMarker}>Delete Marker</button>
+        <button className='rounded-full bg-blue-900 text-white hover:text-black hover:bg-white hover:border-blue-900 border py-2 px-4' onClick={handleDeleteMarker}>Mark Visited</button>
       </div>
       <button className='rounded-full bg-blue-900 text-white hover:text-black hover:bg-white hover:border-blue-900 border py-2 px-4' onClick={handleCalculateRoute}>Calculate Route</button>
     </div>

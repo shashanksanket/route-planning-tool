@@ -76,7 +76,6 @@ export const sendDeleteRequest = async (
 };
 
 const addQueryToUrl = (url: string, query: any) => {
-  console.log(url)
   const queryKeys = Object.keys(query);
   if (queryKeys.length === 0) {
     return url;

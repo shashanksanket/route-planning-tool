@@ -17,12 +17,9 @@ async function createTable() {
     });
   }
 
-  // Check if the "addresses" table exists
   const tableExists = await db.get(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='addresses'"
   );
-  console.log(tableExists)
-  // If the table does not exist, create it
   if (!tableExists) {
     await db.exec(`
       CREATE TABLE addresses (

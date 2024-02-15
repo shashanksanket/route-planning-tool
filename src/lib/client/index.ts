@@ -26,7 +26,6 @@ export class Client {
     latitude: number,
     isCurrentLocation: boolean
   ): Promise<Response> {
-    console.log(isCurrentLocation)
     const body = { location, longitude, latitude, isCurrentLocation };
     return this.handleResponse(
       sendPostRequest(
