@@ -33,6 +33,9 @@ export default function Home() {
       script.onload = () => {
         setMapLoaded(true);
       };
+      script.onerror = (error) => {
+        console.error('Error loading Google Maps API:', error);
+      };
       document.head.appendChild(script);
     };
 
@@ -46,7 +49,7 @@ export default function Home() {
     if (mapLoaded && !googleMap) {
       const mapInstance = new google.maps.Map(document.getElementById('map')!, {
         center: { lat: 0, lng: 0 },
-        zoom: 8,
+        zoom: 1,
       });
       setGoogleMap(mapInstance);
       setMap(mapInstance);
@@ -103,6 +106,9 @@ export default function Home() {
         if (selectedMarkTitle == "") {
           const lastAddress = addresses[addresses.length - 1];
           map.setCenter({ lat: lastAddress.latitude, lng: lastAddress.longitude });
+          if (map.getZoom()||0<8){
+            map.setZoom(8)
+          }
         }
       }
       markers.forEach(marker => marker.setMap(null));
@@ -221,7 +227,7 @@ export default function Home() {
       const location = address;
       return { location: location, stopover: true };
     });
-
+  
     const request: google.maps.DirectionsRequest = {
       origin: waypoints.shift()!.location!,
       destination: waypoints.pop()!.location!,
@@ -229,18 +235,23 @@ export default function Home() {
       optimizeWaypoints: true,
       travelMode: google.maps.TravelMode.DRIVING
     };
-
+  
     const directionsService = new google.maps.DirectionsService();
     const directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
-
+    // Clear existing directions and path overlay from the map
+    directionsRenderer.setDirections(null);
+  
     directionsService.route(request, function (response, status) {
       if (status === "OK") {
+        // Clear existing path overlay from the map
+        setMap(null)
         directionsRenderer.setDirections(response);
       } else {
-        alert("No roots can be found for a pair of locations");
+        alert("No routes can be found for a pair of locations");
       }
     });
   };
+  
   const handleCalculateRoute = async () => {
     let technitianMarker: google.maps.Marker | undefined;
     const destinations: google.maps.Marker[] = [];
@@ -269,11 +280,18 @@ export default function Home() {
   };
 
   const handleMarkerSelect = (id: string) => {
-    setSelectedMarkerId(id);
-    const selectedMarker = markersList.find(marker => marker._id === id);
-    setSelectedMarkerTitle(selectedMarker?.location || "")
-    if (selectedMarker && map) {
-      map.setCenter({ lat: selectedMarker.latitude, lng: selectedMarker.longitude });
+    if(id){
+
+      setSelectedMarkerId(id);
+      const selectedMarker = markersList.find(marker => marker._id === id);
+      setSelectedMarkerTitle(selectedMarker?.location || "")
+      if (selectedMarker && map) {
+        map.setCenter({ lat: selectedMarker.latitude, lng: selectedMarker.longitude });
+        if (map.getZoom()||0<8){
+          map.setZoom(8)
+        }
+        
+      }
     }
   };
   useEffect(() => {
@@ -285,11 +303,9 @@ export default function Home() {
   }, [markers, googleMap]);
 
   const handleDeleteMarker = async () => {
-    console.log(selectedMarkerId)
     if (selectedMarkerId) {
       const markerId = selectedMarkerId;
       const res = await client.addressDelete(markerId);
-      console.log(res)
       setSelectedMarkerId(null);
       const updatedMarkers = markers.filter(marker => marker.getTitle() !== selectedMarkTitle);
       markers.forEach(marker => marker.setMap(null));
@@ -297,7 +313,7 @@ export default function Home() {
       setMap(null);
       const newMapInstance = new google.maps.Map(document.getElementById('map')!, {
         center: { lat: 0, lng: 0 },
-        zoom: 8,
+        zoom: 1,
       });
       setGoogleMap(newMapInstance);
       setMap(newMapInstance);

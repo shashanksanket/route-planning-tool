@@ -84,7 +84,6 @@ export async function POST(req: any, res: any) {
 
 export async function DELETE(req: any, res: any) {
   try {
-    console.log("here")
     await connectToDataBase();
 
     const { id } = await req.json();

@@ -26,10 +26,8 @@ export async function DELETE(req: any, res: any) {
     await connectToDataBase();
 
     const { _id } = await req.json();
-    console.log("here inside abckend",_id)
     const deletedEntry = await db!.collection("addresses").findOneAndDelete({ _id: new ObjectId(_id) });
 
-    console.log(deletedEntry)
     return new Response(
       JSON.stringify({ message: "success" }),
       {

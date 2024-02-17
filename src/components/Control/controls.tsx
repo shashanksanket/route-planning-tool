@@ -11,7 +11,7 @@ interface ControlsComponentProps {
   handleCalculateRoute: () => void;
 }
 
-const ControlsComponent: React.FC<ControlsComponentProps> = ({ 
+const ControlsComponent: React.FC<ControlsComponentProps> = ({
   inputRef,
   handleInputFocus,
   handleMarkLocation,
@@ -19,7 +19,7 @@ const ControlsComponent: React.FC<ControlsComponentProps> = ({
   markersList,
   handleMarkerSelect,
   handleDeleteMarker,
-  handleCalculateRoute 
+  handleCalculateRoute
 }) => {
   return (
     <div className='flex py-3 flex-wrap px-2 flex-col md:flex-row justify-around gap-10'>
@@ -27,13 +27,12 @@ const ControlsComponent: React.FC<ControlsComponentProps> = ({
         <input className='border rounded py-2 px-4' ref={inputRef} onFocus={handleInputFocus} placeholder="Enter a location" />
         <button className='rounded-full bg-blue-900 text-white hover:text-black hover:bg-white hover:border-blue-900 border py-2 px-4' onClick={handleMarkLocation}>Mark Location</button>
       </div>
-
       <div className='flex flex-wrap flex-col md:flex-row gap-5'>
         <select
           className='border rounded py-2 px-4'
           value={selectedMarkerId || ""}
           onChange={(e) => {
-            const selectedMarkerId = e.target.value;
+            const selectedMarkerId = e?.target?.value;
             handleMarkerSelect(selectedMarkerId);
           }}
         >

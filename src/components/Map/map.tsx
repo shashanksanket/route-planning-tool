@@ -7,26 +7,6 @@ interface MapComponentProps {
 const MapComponent: React.FC<MapComponentProps> = ({ markers }) => {
   const [googleMap, setGoogleMap] = useState<google.maps.Map>();
 
-
-  useEffect(() => {
-    const loadMapScript = () => {
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
-      script.async = true;
-      script.defer = true;
-      script.onload = () => {
-        const mapInstance = new google.maps.Map(document.getElementById('map')!, {
-          center: { lat: 0, lng: 0 },
-          zoom: 8,
-        });
-        setGoogleMap(mapInstance);
-      };
-      document.head.appendChild(script);
-    };
-
-    loadMapScript();
-  }, []);
-
   useEffect(() => {
     if (googleMap && markers.length > 0) {
       markers.forEach(marker => {
